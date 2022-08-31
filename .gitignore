@@ -1,0 +1,12 @@
+__pycache__
+New_Database.xml
+logs/*.log
+dev.py
+run*
+config_bak.json
+config_old.json
+pubkeys/
+*.db
+.vscode
+.git
+test.py

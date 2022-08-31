@@ -1,0 +1,8 @@
+{
+    "port": 7777,
+    "mod_name": "Castling",
+    "mod_resource_path": "/mod",
+    "server_profiles_path": "/profiles",
+    "admin_token": "",
+    "close_insert_pubkey": true
+}
