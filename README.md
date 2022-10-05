@@ -149,7 +149,7 @@ python example_insert_pubkey.py username_or_uid path_to_pub_key
 
 请求参数：
 - 必须
-    - id，字符串类型，通过search_id_by_name获得的id
+    - id，整型，通过search_id_by_name获得的id
     - key，字符串类型，通过search_key_by_name或search_key_by_key获得的key
     - cls，字符串类型，1stweapon, 2stweapon, throwable, armor, drop
 - 非必须
@@ -167,7 +167,7 @@ python example_insert_pubkey.py username_or_uid path_to_pub_key
 
 请求参数：
 - 必须
-    - id，字符串类型，通过search_id_by_name获得的id
+    - id，整型，通过search_id_by_name获得的id
     - key，字符串类型，通过search_key_by_name或search_key_by_key获得的key
 - 非必须
     - num，整型，要给的数量，默认1，如果是-1则全删
@@ -191,8 +191,8 @@ python example_insert_pubkey.py username_or_uid path_to_pub_key
 
 请求参数：
 - 必须
-    - id_buyer，买家id，字符串类型，通过search_id_by_name获得的id
-    - id_seller，卖家id，字符串类型，通过search_id_by_name获得的id
+    - id_buyer，买家id，整型，通过search_id_by_name获得的id
+    - id_seller，卖家id，整型，通过search_id_by_name获得的id
     - key，字符串类型，通过search_key_by_name或search_key_by_key获得的key
     - price，浮点数类型，交易物品的价格
 

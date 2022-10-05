@@ -4,7 +4,7 @@ from .util import restore, backup
 from dao import KeyDB, PersonDB, ProfileDB
 from loguru import logger
 from .basic_hander import BasicHandler
-
+import traceback
 
 class CastlingHandler(BasicHandler):
     def __init__(self, config: dict, REGENERATE=True) -> None:
@@ -37,7 +37,7 @@ class CastlingHandler(BasicHandler):
             return ret
         except Exception as e:
             ret = self.failure_json.copy()
-            ret["error_msg"] = e
+            ret["error_msg"] = traceback.format_exc()
             logger.debug("Database refresh failed")
             logger.debug(f"refresh_db return: {ret}")
             return ret
@@ -130,7 +130,7 @@ class CastlingHandler(BasicHandler):
             try:
                 msg = add_item_stash_backpack(id_person, key, cls, dst, num)
             except Exception as e:
-                msg = e
+                msg = traceback.format_exc()
             if msg == "success":
                 ret = self.success_json.copy()
                 logger.debug(f"give_id_key return, ret: {ret}")
@@ -161,7 +161,7 @@ class CastlingHandler(BasicHandler):
         try:
             msg, cnt = delete_item_everywhere(id_person, key, num)
         except Exception as e:
-            msg = e
+            msg = traceback.format_exc()
         if msg == "success":
             ret = self.success_json.copy()
             ret["results"] = cnt
@@ -217,13 +217,13 @@ class CastlingHandler(BasicHandler):
         except Exception as e:
             restore(id_seller)
             ret = self.failure_json.copy()
-            ret["error_msg"] = f"已恢复卖家存档，因在处理卖家时出现错误：{e}"
+            ret["error_msg"] = f"已恢复卖家存档，因在处理卖家时出现错误：{traceback.format_exc()}"
             logger.debug(f"make_deal return, ret: {ret}")
             return ret
 
         backup(id_buyer)
         try:
-            msg = add_item_stash_backpack(id_buyer, key, "1stweapon", "stash", 1)
+            msg = add_item_stash_backpack(id_buyer, key, "1stweapon", "backpack", 1)
             logger.debug(f"add_item_stash_backpack return: msg:{msg}")
             if msg == "success":
                 ret["results"] += f"，给买家发放1把武器"
@@ -250,7 +250,7 @@ class CastlingHandler(BasicHandler):
             restore(id_seller)
             restore(id_buyer)
             ret = self.failure_json.copy()
-            ret["error_msg"] = f"已恢复买卖双方存档，因在处理买家时出现错误：{e}"
+            ret["error_msg"] = f"已恢复买卖双方存档，因在处理买家时出现错误：{traceback.format_exc()}"
             logger.debug(f"make_deal return, ret: {ret}")
             return ret
         return ret

@@ -1,6 +1,7 @@
 from hashlib import md5
 import os
 from time import strftime
+import traceback
 from uuid import uuid4
 from flask import Flask, request, jsonify, session, make_response
 from loguru import logger
@@ -18,6 +19,7 @@ logger.add(f"logs/{strftime('%Y-%m-%d')}.log",
 config = read_config()
 if config["mod_name"] == "Castling":
     handler = CastlingHandler(config, True)
+    logger.success("Handler created")
 
 if "session_sec_key" not in config.keys() or config["session_sec_key"] == "":
     app.config["SECRET_KEY"] = os.urandom(24)
@@ -180,7 +182,7 @@ def make_deal():
         try:
             price = float(request.args.get("price"))
         except Exception as e:
-            return jsonify({"status": "failure", "error_msg": e})
+            return jsonify({"status": "failure", "error_msg": traceback.format_exc()})
         res = handler.make_deal(id_buyer, id_seller, key, price)
         return jsonify(res)
     return jsonify({"status": "failure", "error_msg": "didn't login"})

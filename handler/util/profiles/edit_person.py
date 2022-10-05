@@ -65,13 +65,14 @@ def add_item_stash_backpack(id_person: str, key: str, cls: str, dst: str,
     })
 
     # 检查物品项目的属性是否都定义正确
-    for attr in children[0].attrib:
-        if attr in handled_attr:
-            handled_attr.remove(attr)
-        else:
-            return f"`{item_tag}` has an attribute named `{attr}` but it has not been handled. Fuck Jack"
-    if len(handled_attr) != 0:
-        return "These attributes maybe removed from `{}`: {}. Fuck Jack".format(item_tag, ','.join(handled_attr))
+    if len(children) != 0:
+        for attr in children[0].attrib:
+            if attr in handled_attr:
+                handled_attr.remove(attr)
+            else:
+                return f"`{item_tag}` has an attribute named `{attr}` but it has not been handled. Fuck Jack"
+        if len(handled_attr) != 0:
+            return "These attributes maybe removed from `{}`: {}. Fuck Jack".format(item_tag, ','.join(handled_attr))
 
     stash.append(item)
 
@@ -91,9 +92,9 @@ def delete_item_everywhere(id_person: str, key: str, num: int):
     try:
         tree = et.parse(id_person)
     except et.ParseError:
-        return "ParseError", 0
+        return "ParseError", -1
     except FileNotFoundError:
-        return f"{id_person} not found", 0
+        return f"{id_person} not found", -1
 
     cnt = 0
 
