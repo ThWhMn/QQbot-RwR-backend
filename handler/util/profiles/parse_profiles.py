@@ -8,6 +8,8 @@ def parse_person(person_path:str):
         tree = et.parse(person_path)
     except ParseError:
         return None, None
+    except FileNotFoundError:
+        return None, None
     for person in tree.iter(tag="person"):
         xp = person.attrib['authority']
         rp = person.attrib['job_points']
@@ -24,7 +26,7 @@ def parse_all_person(profiles_folder_path:str):
                 uid = int(file.name.replace('.person',''))
                 filename_name.append((uid, xp, rp))
             except:
-                logger.error(f"{file.name} has something wrong")
+                logger.warning(f"{file.name} has something wrong")
     logger.debug(f"一共搞了{len(filename_name)}个角色仓库存档")
     return (("ID", "XP", "RP"), filename_name)
 
@@ -32,6 +34,8 @@ def parse_profile(profile_path:str):
     try:
         tree = et.parse(profile_path)
     except ParseError:
+        return None
+    except FileNotFoundError:
         return None
     for person in tree.iter(tag="profile"):
         username = person.attrib['username']
@@ -48,7 +52,7 @@ def parse_all_profile(profiles_folder_path:str):
                 uid = int(file.name.replace('.profile',''))
                 filename_name.append((uid, username))
             except:
-                logger.error(f"{file.name} has something wrong")
+                logger.warning(f"{file.name} has something wrong")
     logger.debug(f"一共搞了{len(filename_name)}个角色资料存档")
     return (("ID", "Name"), filename_name)
 
