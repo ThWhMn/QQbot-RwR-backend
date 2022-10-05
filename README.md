@@ -120,7 +120,7 @@ python example_insert_pubkey.py username_or_uid path_to_pub_key
 
 响应：
 - status，字符串类型，分两类，success和failure
-    - 如果是success，另带results参数，是list[[key, name, text]]的类型
+    - 如果是success，另带results参数，是list[[key, name, text, class]]的类型，class为"0"或"3"
     - 如果是failure，则另带error_msg参数
 
 ### GET /search_key_by_name
@@ -131,7 +131,7 @@ python example_insert_pubkey.py username_or_uid path_to_pub_key
 
 响应：
 - status，字符串类型，分两类，success和failure
-    - 如果是success，另带results参数，是list[[key, name, text]]的类型
+    - 如果是success，另带results参数，是list[[key, name, text, class]]的类型，class为"0"或"3"
     - 如果是failure，则另带error_msg参数
 
 ### GET /search_id_by_name

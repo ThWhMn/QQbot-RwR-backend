@@ -18,7 +18,7 @@ class CastlingHandler(BasicHandler):
         self.make_key_db()
         self.make_person_db()
         self.make_profile_db()
-    
+
     def refresh_db(self):
         try:
             logger.debug("refresh_db start")
@@ -58,8 +58,8 @@ class CastlingHandler(BasicHandler):
 
     def make_profile_db(self):
         self.profile_db = ProfileDB(self.profile_db_path, self.REGENERATE)
-        self.colname_persons = parse_all_profile(self.profiles_path)
-        self.profile_db.insert_all_profiles(self.colname_persons)
+        self.colname_profiles = parse_all_profile(self.profiles_path)
+        self.profile_db.insert_all_profiles(self.colname_profiles)
         logger.debug("Profile database built successfully")
         self.PROFILE_DONE = True
 
@@ -113,7 +113,7 @@ class CastlingHandler(BasicHandler):
                     id_person: str,
                     key: str,
                     cls: str,
-                    dst: str = "stash",
+                    dst: str = "backpack",
                     num: int = 1):
         logger.debug("give_id_key start, args: {}".format({
             'id_person': id_person,
@@ -127,7 +127,10 @@ class CastlingHandler(BasicHandler):
                 id_person += ".person"
             id_person = self.profiles_path + '/' + id_person
             backup(id_person)
-            msg = add_item_stash_backpack(id_person, key, cls, dst, num)
+            try:
+                msg = add_item_stash_backpack(id_person, key, cls, dst, num)
+            except Exception as e:
+                msg = e
             if msg == "success":
                 ret = self.success_json.copy()
                 logger.debug(f"give_id_key return, ret: {ret}")
@@ -155,7 +158,10 @@ class CastlingHandler(BasicHandler):
             id_person += ".person"
         id_person = self.profiles_path + '/' + id_person
         backup(id_person)
-        msg, cnt = delete_item_everywhere(id_person, key, num)
+        try:
+            msg, cnt = delete_item_everywhere(id_person, key, num)
+        except Exception as e:
+            msg = e
         if msg == "success":
             ret = self.success_json.copy()
             ret["results"] = cnt
@@ -188,7 +194,7 @@ class CastlingHandler(BasicHandler):
             msg, cnt = delete_item_everywhere(id_seller, key, -1)
             logger.debug(f"delete_item_everywhere return: msg:{msg}, cnt:{cnt}")
             if cnt == 0:
-                msg = "删除卖家0把武器"
+                msg = "卖家没有武器"
             if msg == "success":
                 ret = self.success_json.copy()
                 ret["results"] = f"删除卖家{cnt}把武器"
@@ -211,7 +217,7 @@ class CastlingHandler(BasicHandler):
         except Exception as e:
             restore(id_seller)
             ret = self.failure_json.copy()
-            ret["error_msg"] = f"已恢复卖家存档，因出现错误：{e}"
+            ret["error_msg"] = f"已恢复卖家存档，因在处理卖家时出现错误：{e}"
             logger.debug(f"make_deal return, ret: {ret}")
             return ret
 
@@ -237,14 +243,14 @@ class CastlingHandler(BasicHandler):
                 restore(id_seller)
                 restore(id_buyer)
                 ret = self.failure_json.copy()
-                ret["error_msg"] = f"已恢复买卖双方存档，因在发放买家武器时出现错误：{msg}"
+                ret["error_msg"] = f"已恢复买卖双方存档，因在扣除买家rp时出现错误：{msg}"
                 logger.debug(f"make_deal return, ret: {ret}")
                 return ret
         except Exception as e:
             restore(id_seller)
             restore(id_buyer)
             ret = self.failure_json.copy()
-            ret["error_msg"] = f"已恢复买卖双方存档，因出现错误：{e}"
+            ret["error_msg"] = f"已恢复买卖双方存档，因在处理买家时出现错误：{e}"
             logger.debug(f"make_deal return, ret: {ret}")
             return ret
         return ret

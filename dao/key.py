@@ -11,7 +11,8 @@ class KeyDB(SqlBase):
         stmt = '''CREATE TABLE `Key`
         (`Key` TEXT PRIMARY KEY    NOT NULL,
         `Name` TEXT    NOT NULL,
-        `Text` TEXT    NOT NULL);'''
+        `Text` TEXT    NOT NULL,
+        `Class` TEXT   Not NULL);'''
         self.execute(stmt)
 
     def insert_all_keys(self, colname_keys:tuple):

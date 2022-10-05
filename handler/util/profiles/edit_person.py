@@ -45,17 +45,35 @@ def add_item_stash_backpack(id_person: str, key: str, cls: str, dst: str,
     # 判断容量
     stash = tree.find(dst)
     capacity = int(stash.attrib["hard_capacity"])
-    occupied = len(stash.getchildren())
-    if occupied + num > capacity:
-        return f"{dst.title()} capacity is not enough"
 
-    item = et.Element("item", {
+    item_tag = "item_group"
+    occupied = 0
+    children = list(stash)
+    for child in children:
+        if child.tag != item_tag:
+            return f"Item tag is `{child.tag}` not `{item_tag}`. Fuck Jack"
+        occupied += int(child.attrib["amount"])
+    if occupied + num > capacity:
+        return f"`{dst.title()}` capacity is not enough"
+
+    handled_attr = ["class", "index", "key", "amount"]
+    item = et.Element(item_tag, {
         "class": class2index[cls],
         "index": '-1',
-        "key": key
+        "key": key,
+        "amount":  str(num),
     })
-    for i in range(num):
-        stash.append(item)
+
+    # 检查物品项目的属性是否都定义正确
+    for attr in children[0].attrib:
+        if attr in handled_attr:
+            handled_attr.remove(attr)
+        else:
+            return f"`{item_tag}` has an attribute named `{attr}` but it has not been handled. Fuck Jack"
+    if len(handled_attr) != 0:
+        return "These attributes maybe removed from `{}`: {}. Fuck Jack".format(item_tag, ','.join(handled_attr))
+
+    stash.append(item)
 
     tmp = et.tostring(tree.getroot(), encoding='unicode')
     lstr = minidom.parseString(tmp.replace('\n', '').replace(
@@ -89,12 +107,18 @@ def delete_item_everywhere(id_person: str, key: str, num: int):
             f.write(lstr)
 
     # 搜索仓库和背包
-    for cls in ["stash", "backpack"]:
-        stash_back = tree.find(cls)
-        for i in stash_back.findall("./item"):
-            if i.attrib["key"] == key:
-                stash_back.remove(i)
-                cnt += 1
+    for dst in ["stash", "backpack"]:
+        stash_back = tree.find(dst)
+
+        item_tag = "item_group"
+        children = list(stash_back)
+
+        for child in children:
+            if child.tag != item_tag:
+                return f"Item tag is `{child.tag}` not `{item_tag}`. Fuck Jack"
+            if child.attrib["key"] == key:
+                stash_back.remove(child)
+                cnt += int(child.attrib["amount"])
                 if cnt >= num and num != -1:
                     write()
                     return "success", cnt
@@ -152,9 +176,12 @@ def change_rp(id_person: str, inc_dec: float):
 
 if __name__ == "__main__":
     id_person = r"D:\ProgramData\QQ\1692657550\FileRecv\profiles\2089573664.person"
+    id_person = r"E:\ProgramFiles\steamcmd\running_with_rifles_server\profiles\2089573664.person"
     cls = "1stweapon"
     key = "m16a4.weapon"
+    key = "medikit.weapon"
     print(delete_item_everywhere(id_person, key, -1))
 
-    # add_item_stash_backpack(id_person, key, cls)
+    # print(add_item_stash_backpack(id_person, key, cls, dst="backpack", num=1))
+    # print(add_item_stash_backpack(id_person, key, cls, dst="stash", num=1))
     # print(change_rp(id_person, "-200"))

@@ -46,5 +46,6 @@ def parse_all_profile(profiles_folder_path:str):
 
 if __name__ == "__main__":
     server_profiles_path= "D:/ProgramData/QQ/1692657550/FileRecv/profiles"
+    server_profiles_path= r"E:\ProgramFiles\steamcmd\running_with_rifles_server\profiles"
 
     parse_all_person(server_profiles_path)

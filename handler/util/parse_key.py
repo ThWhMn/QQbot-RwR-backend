@@ -26,9 +26,9 @@ def parse_merged_weapon(merged_weapon_path: str, mod_text_path: str = ""):
 
     tree = et.parse(merged_weapon_path)
 
-    global keys_name_text, existed
+    global key_name_text_cls, existed
     existed = []
-    keys_name_text = []
+    key_name_text_cls = []
     for elem in tree.iter(tag="weapon"):
         key = elem.attrib['key']
         if 'ai' in key:
@@ -44,10 +44,10 @@ def parse_merged_weapon(merged_weapon_path: str, mod_text_path: str = ""):
             text = name
         if key in existed:
             continue
-        keys_name_text.append((key, name, text))
+        key_name_text_cls.append((key, name, text, "0"))
         existed.append(key)
-    logger.debug(f"一共搞了{len(keys_name_text)}把武器")
-    return (("Key", "Name", "Text"), keys_name_text)
+    logger.debug(f"一共搞了{len(key_name_text_cls)}把武器")
+    return (("Key", "Name", "Text", "Class"), key_name_text_cls)
 
 
 def parse_merged_carryitem(merged_carryitem_path: str, mod_text_path: str = ""):
@@ -56,9 +56,9 @@ def parse_merged_carryitem(merged_carryitem_path: str, mod_text_path: str = ""):
 
     tree = et.parse(merged_carryitem_path)
 
-    global keys_name_text, existed
+    global key_name_text_cls, existed
     existed = []
-    keys_name_text = []
+    key_name_text_cls = []
     for elem in tree.iter(tag="carry_item"):
         key = elem.attrib['key']
         name = elem.attrib['name']
@@ -68,10 +68,10 @@ def parse_merged_carryitem(merged_carryitem_path: str, mod_text_path: str = ""):
             text = name
         if key in existed:
             continue
-        keys_name_text.append((key, name, text))
+        key_name_text_cls.append((key, name, text, "3"))
         existed.append(key)
-    logger.debug(f"一共搞了{len(keys_name_text)}个物品")
-    return (("Key", "Name", "Text"), keys_name_text)
+    logger.debug(f"一共搞了{len(key_name_text_cls)}个物品")
+    return (("Key", "Name", "Text", "Class"), key_name_text_cls)
 
 
 def parse_all_key(mod_dir:str):
@@ -85,11 +85,16 @@ def parse_all_key(mod_dir:str):
     # merged_valuable_path = mod_items_dir + r"/merged_valuable.valuable"
 
     column, k_n_t1 = parse_merged_weapon(merged_weapon_path, mod_text_path)
-    column, k_n_t2 = parse_merged_carryitem(merged_carryitem_path, mod_text_path)
+    try:
+        column, k_n_t2 = parse_merged_carryitem(merged_carryitem_path, mod_text_path)
+    except FileNotFoundError:
+        merged_carryitem_path = mod_weapon_dir + r"/merged_carry_item.carry_item"
+        column, k_n_t2 = parse_merged_carryitem(merged_carryitem_path, mod_text_path)
+
     # column, k_n_t3 = parse_merged_carryitem(merged_valuable_path, mod_text_path)
     
     return (column, k_n_t1+k_n_t2)
-    
+
 if __name__ == "__main__":
     mod_dir = r"E:/SteamLibrary/steamapps/workshop/content/270150/2606099273/media/packages/GFL_Castling"
 

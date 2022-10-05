@@ -23,9 +23,11 @@ elif platform.system() == "Linux":
     run = "run.sh"
     bak = "run_bak.sh"
 
+container_name = "thwh_RWR"
+img_name = "thwh_rwr_profile_server"
 # 生成remove
-rm_con = "docker rm -f RWR\n"
-rm_img = "docker rmi rwr_profile_server\n"
+rm_con = f"docker rm -f {container_name}\n"
+rm_img = f"docker rmi {img_name}\n"
 
 with open(remove, "w") as f:
     f.write(rm_con)
@@ -37,17 +39,17 @@ if run.endswith("bat"):
 elif run.endswith("sh"):
     build = "chmod 777 run_remove.sh run_bak.sh\n"
 
-build += "docker build -t rwr_profile_server .\n"
+build += f"docker build -t {img_name} .\n"
 v_part = f"-v {mod_resource_path}:/mod -v {server_profiles_path}:/profiles"
 v_part += f" -v {os.path.dirname(os.path.realpath(__file__))}/logs:/logs"
 v_part += f" -v {os.path.dirname(os.path.realpath(__file__))}/data:/data"
-rundo = f"docker run -idt --name RWR -p {port}:{port} {v_part} rwr_profile_server\n"
+run_dock = f"docker run -idt --name {container_name} -p {port}:{port} {v_part} {img_name}\n"
 
 with open(run, "w") as f:
     f.write(rm_con)
     f.write(rm_img)
     f.write(build)
-    f.write(rundo)
+    f.write(run_dock)
 
 with open("config.json", "w") as f:
     config["mod_resource_path"] = "/mod"
