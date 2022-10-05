@@ -9,6 +9,7 @@ def parse_person(person_path:str):
     except ParseError:
         return None, None
     except FileNotFoundError:
+        logger.warning(f"{person_path} not fonud")
         return None, None
     for person in tree.iter(tag="person"):
         xp = person.attrib['authority']
@@ -36,6 +37,7 @@ def parse_profile(profile_path:str):
     except ParseError:
         return None
     except FileNotFoundError:
+        logger.warning(f"{profile_path} not fonud")
         return None
     for person in tree.iter(tag="profile"):
         username = person.attrib['username']
