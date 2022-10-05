@@ -20,7 +20,11 @@ def parse_all_person(profiles_folder_path:str):
             xp, rp = parse_person(file.path)
             if xp is None:
                 continue
-            filename_name.append((file.name.replace('.person',''), xp, rp))
+            try:
+                uid = int(file.name.replace('.person',''))
+                filename_name.append((uid, xp, rp))
+            except:
+                logger.error(f"{file.name} has something wrong")
     logger.debug(f"一共搞了{len(filename_name)}个角色仓库存档")
     return (("ID", "XP", "RP"), filename_name)
 
@@ -40,7 +44,11 @@ def parse_all_profile(profiles_folder_path:str):
             username = parse_profile(file.path)
             if username is None:
                 continue
-            filename_name.append((file.name.replace('.profile',''), username))
+            try:
+                uid = int(file.name.replace('.profile',''))
+                filename_name.append((uid, username))
+            except:
+                logger.error(f"{file.name} has something wrong")
     logger.debug(f"一共搞了{len(filename_name)}个角色资料存档")
     return (("ID", "Name"), filename_name)
 
