@@ -9,9 +9,9 @@ class PersonDB(SqlBase):
     def create(self):
         self.drop('Person')
         stmt = '''CREATE TABLE `Person`
-        (`ID` TEXT PRIMARY KEY     NOT NULL,
-        `XP`      TEXT    NOT NULL,
-        `RP`      TEXT    NOT NULL);'''
+        (`ID` INTEGER PRIMARY KEY     NOT NULL,
+        `XP`      REAL    NOT NULL,
+        `RP`      REAL    NOT NULL);'''
         self.execute(stmt)
 
     def insert_all_persons(self, colname_persons:tuple):

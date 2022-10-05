@@ -9,7 +9,7 @@ class ProfileDB(SqlBase):
     def create(self):
         self.drop('Profile')
         stmt = '''CREATE TABLE `Profile`
-        (`ID` TEXT PRIMARY KEY     NOT NULL,
+        (`ID` INTEGER PRIMARY KEY     NOT NULL,
         `Name`      TEXT    NOT NULL);'''
         self.execute(stmt)
 
