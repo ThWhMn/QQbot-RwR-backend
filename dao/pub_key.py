@@ -1,6 +1,6 @@
 from .sql_base import SqlBase
 
-
+# 暂时没有用到
 class PublicKey(SqlBase):
     def __init__(self, pub_key_db_path, REGENERATE=True) -> None:
         super().__init__(pub_key_db_path)
