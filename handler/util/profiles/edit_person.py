@@ -92,7 +92,7 @@ def delete_item_everywhere(id_person: str, key: str, num: int):
     try:
         tree = et.parse(id_person)
     except et.ParseError:
-        return "ParseError", -1
+        return f"ParseError in {id_person}", -1
     except FileNotFoundError:
         return f"{id_person} not found", -1
     if num == 0:

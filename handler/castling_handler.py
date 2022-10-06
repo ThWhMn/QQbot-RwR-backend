@@ -231,8 +231,8 @@ class CastlingHandler(BasicHandler):
             ret = self.search_key_by_key(key)["results"][0][1]
             cnt = 0
             for item in ret:
-                key = item[0]
-                msg, tmp = delete_item_everywhere(id_seller, key, -1)
+                tmpkey = item[0]
+                msg, tmp = delete_item_everywhere(id_seller, tmpkey, -1)
                 cnt += tmp
                 if msg != "success":
                     break
