@@ -6,6 +6,7 @@ from loguru import logger
 from .basic_hander import BasicHandler
 import traceback
 
+
 class CastlingHandler(BasicHandler):
     def __init__(self, config: dict, REGENERATE=True) -> None:
         super().__init__(config, REGENERATE)
@@ -63,6 +64,25 @@ class CastlingHandler(BasicHandler):
         logger.debug("Profile database built successfully")
         self.PROFILE_DONE = True
 
+    def group_keys(self, fetched: list):
+        key2msg = {}
+        for row in fetched:
+            key2msg[row[0]] = row
+
+        keys = list(key2msg.keys())
+        ret = []
+        while len(keys) != 0:
+            key = keys.pop(0)
+            nxt = key2msg[key][4]
+            bucket = [key]
+            while nxt != "" and nxt != key:
+                bucket.append(nxt)
+                keys.remove(nxt)
+                nxt = key2msg[nxt][4]
+            ret.append([key2msg[bucket[0]], [key2msg[k] for k in bucket]])
+
+        return ret
+
     def search_key_by_key(self, key: str):
         logger.debug(f"search_key_by_key start, key: {key}")
         if not self.KEY_DONE:
@@ -71,10 +91,19 @@ class CastlingHandler(BasicHandler):
             return ret
 
         ret1 = self.key_db.fetchall_by_key(key)
-        ans = list(ret1)
+        # [()]
+        if len(ret1) != 0 and ret1[0][4] != "":
+            bucket = [ret1[0][0]]
+            nxt = ret1[0][4]
+            while nxt not in bucket:
+                bucket.append(nxt)
+                nxt = self.key_db.fetchall_by_key(nxt)
+                ret1 += nxt
+                nxt = nxt[0][4]
+        ans = ret1
 
         ret = self.success_json.copy()
-        ret["results"] = ans
+        ret["results"] = self.group_keys(ans)
         logger.debug(f"search_key_by_name return, ret: {ret}")
         return ret
 
@@ -90,7 +119,7 @@ class CastlingHandler(BasicHandler):
         ans = list(ret1 + ret2)
 
         ret = self.success_json.copy()
-        ret["results"] = ans
+        ret["results"] = self.group_keys(ans)
         logger.debug(f"search_key_by_name return, ret: {ret}")
         return ret
 
@@ -159,7 +188,16 @@ class CastlingHandler(BasicHandler):
         id_person = self.profiles_path + '/' + id_person
         backup(id_person)
         try:
-            msg, cnt = delete_item_everywhere(id_person, key, num)
+            ret = self.search_key_by_key(key)["results"][0][1]
+            cnt = 0
+            for item in ret:
+                key = item[0]
+                msg, tmp = delete_item_everywhere(id_person, key, num)
+                cnt += tmp
+                num -= tmp
+                if msg != "success":
+                    break
+
         except Exception as e:
             msg = traceback.format_exc()
         if msg == "success":
@@ -174,7 +212,7 @@ class CastlingHandler(BasicHandler):
             logger.debug(f"delete_id_key return, ret: {ret}")
             return ret
 
-    def make_deal(self, id_buyer:str, id_seller:str, key:str, price:float):
+    def make_deal(self, id_buyer: str, id_seller: str, key: str, price: float):
         logger.debug("make_deal start, args: {}".format({
             'id_buyer': id_buyer,
             'id_seller': id_seller,
@@ -190,10 +228,17 @@ class CastlingHandler(BasicHandler):
         id_seller = self.profiles_path + '/' + id_seller
         backup(id_seller)
         try:
-            # logger.debug(f"delete_item_everywhere start: id_seller:{id_seller}, key:{key}")
-            msg, cnt = delete_item_everywhere(id_seller, key, -1)
-            logger.debug(f"delete_item_everywhere return: msg:{msg}, cnt:{cnt}")
-            if cnt == 0:
+            ret = self.search_key_by_key(key)["results"][0][1]
+            cnt = 0
+            for item in ret:
+                key = item[0]
+                msg, tmp = delete_item_everywhere(id_seller, key, -1)
+                cnt += tmp
+                if msg != "success":
+                    break
+            logger.debug(
+                f"delete_item_everywhere return: msg:{msg}, cnt:{cnt}")
+            if msg == "success" and cnt == 0:
                 msg = "卖家没有武器"
             if msg == "success":
                 ret = self.success_json.copy()
@@ -223,7 +268,8 @@ class CastlingHandler(BasicHandler):
 
         backup(id_buyer)
         try:
-            msg = add_item_stash_backpack(id_buyer, key, "1stweapon", "backpack", 1)
+            msg = add_item_stash_backpack(id_buyer, key, "1stweapon",
+                                          "backpack", 1)
             logger.debug(f"add_item_stash_backpack return: msg:{msg}")
             if msg == "success":
                 ret["results"] += f"，给买家发放1把武器"

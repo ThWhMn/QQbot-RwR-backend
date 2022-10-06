@@ -95,6 +95,8 @@ def delete_item_everywhere(id_person: str, key: str, num: int):
         return "ParseError", -1
     except FileNotFoundError:
         return f"{id_person} not found", -1
+    if num == 0:
+        return "success", 0
 
     cnt = 0
 
@@ -118,11 +120,15 @@ def delete_item_everywhere(id_person: str, key: str, num: int):
             if child.tag != item_tag:
                 return f"Item tag is `{child.tag}` not `{item_tag}`. Fuck Jack"
             if child.attrib["key"] == key:
-                stash_back.remove(child)
                 cnt += int(child.attrib["amount"])
-                if cnt >= num and num != -1:
+                if cnt >= num and num > 0:
+                    if cnt == num:
+                        stash_back.remove(child)
+                    else:
+                        child.attrib["amount"] = str(cnt - num)
                     write()
                     return "success", cnt
+                stash_back.remove(child)
 
     # 搜索手中
     for i in tree.findall("item"):
@@ -131,7 +137,7 @@ def delete_item_everywhere(id_person: str, key: str, num: int):
             i.attrib["amount"] = "0"
             i.attrib["key"] = ""
             cnt += 1
-            if cnt >= num and num != -1:
+            if cnt == num and num > 0:
                 write()
                 return "success", cnt
 

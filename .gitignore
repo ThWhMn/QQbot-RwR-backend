@@ -10,3 +10,4 @@ pubkeys/
 .vscode
 .git
 test.py
+*.whl

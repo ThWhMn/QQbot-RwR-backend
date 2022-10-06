@@ -34,6 +34,13 @@ with open(remove, "w") as f:
     f.write(rm_img)
 
 # 生成run
+pip_pack = "./data/packs"
+if not os.path.exists(pip_pack):
+    os.makedirs(pip_pack)
+    pip_part = f"pip3 download -d {pip_pack} -r requirements.txt\n"
+else:
+    pip_part = ''
+
 if run.endswith("bat"):
     build = ""
 elif run.endswith("sh"):
@@ -46,6 +53,7 @@ v_part += f" -v {os.path.dirname(os.path.realpath(__file__))}/data:/data"
 run_dock = f"docker run -idt --name {container_name} -p {port}:{port} {v_part} {img_name}\n"
 
 with open(run, "w") as f:
+    f.write(pip_part)
     f.write(rm_con)
     f.write(rm_img)
     f.write(build)

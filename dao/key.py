@@ -12,7 +12,8 @@ class KeyDB(SqlBase):
         (`Key` TEXT PRIMARY KEY    NOT NULL,
         `Name` TEXT    NOT NULL,
         `Text` TEXT    NOT NULL,
-        `Class` TEXT   Not NULL);'''
+        `Class` TEXT   NOT NULL,
+        `NextKey` TEXT NOT NULL);'''
         self.execute(stmt)
 
     def insert_all_keys(self, colname_keys:tuple):
